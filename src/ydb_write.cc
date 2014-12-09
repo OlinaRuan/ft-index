@@ -182,34 +182,6 @@ db_put_check_size_constraints(DB *db, const DBT *key, const DBT *val) {
     return r;
 }
 
-//Return 0 if insert is legal
-static int
-db_put_check_overwrite_constraint(DB *db, DB_TXN *txn, DBT *key,
-                                  uint32_t lock_flags, uint32_t overwrite_flag) {
-    int r;
-
-    if (overwrite_flag == 0) { // 0 (yesoverwrite) does not impose constraints.
-        r = 0;
-    } else if (overwrite_flag == DB_NOOVERWRITE) {
-        // Check if (key,anything) exists in dictionary.
-        // If exists, fail.  Otherwise, do insert.
-        // The DB_RMW flag causes the cursor to grab a write lock instead of a read lock on the key if it exists.
-        r = db_getf_set(db, txn, lock_flags|DB_SERIALIZABLE|DB_RMW, key, ydb_getf_do_nothing, NULL);
-        if (r == DB_NOTFOUND) 
-            r = 0;
-        else if (r == 0)      
-            r = DB_KEYEXIST;
-        //Any other error is passed through.
-    } else if (overwrite_flag == DB_NOOVERWRITE_NO_ERROR) {
-        r = 0;
-    } else {
-        //Other flags are not (yet) supported.
-        r = EINVAL;
-    }
-    return r;
-}
-
-
 int
 toku_db_del(DB *db, DB_TXN *txn, DBT *key, uint32_t flags, bool holds_mo_lock) {
     HANDLE_PANICKED_DB(db);
