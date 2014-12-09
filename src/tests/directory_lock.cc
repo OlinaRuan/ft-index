@@ -173,24 +173,6 @@ static void verify_shared_ops_fail(DB_ENV* env, DB* db) {
     CKERR2(r, DB_LOCK_NOTGRANTED);
     r = txn->commit(txn,0); CKERR(r);
 
-    flags = DB_DELETE_ANY;
-
-    r = env->txn_begin(env, NULL, &txn, 0); CKERR(r);
-    r = env_del_multiple_test_no_array(
-        env, db, txn,
-        &key, &val,
-        1, &db, &in_key, &flags);
-    CKERR2(r, DB_LOCK_NOTGRANTED);
-    r = txn->commit(txn,0); CKERR(r);
-
-    r = env->txn_begin(env, NULL, &txn, 0); CKERR(r);
-    r = env_del_multiple_test_no_array(
-        env, NULL, txn,
-        &key, &val,
-        1, &db, &in_key, &flags);
-    CKERR2(r, DB_LOCK_NOTGRANTED);
-    r = txn->commit(txn,0); CKERR(r);
-
     flags = 0;
     
     DBT extra_up;
@@ -355,27 +337,6 @@ int test_main (int argc, char * const argv[]) {
         env, NULL, txnb,
         &key, &val,
         1, &db, &in_key, &in_val, &flags);
-    CKERR(r);
-    verify_excl_ops_fail(env,"foo.db");
-    r = txna->abort(txna); CKERR(r);
-    r = txnb->abort(txnb); CKERR(r);
-
-    flags = DB_DELETE_ANY;
-    r = env->txn_begin(env, NULL, &txna, 0); CKERR(r);
-    r = env->txn_begin(env, NULL, &txnb, 0); CKERR(r);
-    dbt_init(&key, "a", 2);
-    dbt_init(&val, "a", 2);
-    env_del_multiple_test_no_array(
-        env, NULL, txna,
-        &key, &val,
-        1, &db, &in_key, &flags);
-    CKERR(r);
-    dbt_init(&key, "b", 2);
-    dbt_init(&val, "b", 2);
-    env_del_multiple_test_no_array(
-        env, db, txnb,
-        &key, &val,
-        1, &db, &in_key, &flags);
     CKERR(r);
     verify_excl_ops_fail(env,"foo.db");
     r = txna->abort(txna); CKERR(r);

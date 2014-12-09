@@ -202,11 +202,6 @@ static void test_invalid_ops(uint32_t iso_flags) {
     r = db->update_broadcast(db, txn, &val, 0);
     CKERR2(r, EINVAL);
     
-    r = env_put_multiple_test_no_array(env, NULL, txn, &key, &val, 1, &db, &key, &val, 0);
-    CKERR2(r, EINVAL);
-    r = env_del_multiple_test_no_array(env, NULL, txn, &key, &val, 1, &db, &key, 0);
-    CKERR2(r, EINVAL);
-
     r = db->close(db, 0); 
     CKERR(r);
 

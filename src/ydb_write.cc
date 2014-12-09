@@ -610,13 +610,6 @@ cleanup:
     return r;
 }
 
-static void swap_dbts(DBT *a, DBT *b) {
-    DBT c;
-    c = *a;
-    *a = *b;
-    *b = c;
-}
-
 int 
 autotxn_db_del(DB* db, DB_TXN* txn, DBT* key, uint32_t flags) {
     bool changed; int r;
